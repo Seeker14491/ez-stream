@@ -1,0 +1,11 @@
+[package]
+name = "ez-stream"
+version = "0.0.1"
+edition = "2021"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt", "time"]}
+
+[dependencies]
+futures-channel = "0.3"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
