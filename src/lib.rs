@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt::{Debug, Display};
 
+use futures_util::stream::PollNext;
 use futures_util::{future, Future, FutureExt, Stream, StreamExt};
 
 #[derive(Debug, Clone)]
@@ -44,7 +45,10 @@ where
         rx.map(Some).right_stream(),
     ];
 
-    futures_util::stream::select(driver_stream, driven_stream).filter_map(future::ready)
+    futures_util::stream::select_with_strategy(driver_stream, driven_stream, |_: &mut ()| {
+        PollNext::Right
+    })
+    .filter_map(future::ready)
 }
 
 pub fn try_unbounded<T, E, Fut>(
@@ -66,7 +70,10 @@ where
         rx.map(|item| Some(Ok(item))).right_stream(),
     ];
 
-    futures_util::stream::select(driver_stream, driven_stream).filter_map(future::ready)
+    futures_util::stream::select_with_strategy(driver_stream, driven_stream, |_: &mut ()| {
+        PollNext::Right
+    })
+    .filter_map(future::ready)
 }
 
 #[cfg(test)]
